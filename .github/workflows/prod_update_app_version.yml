@@ -1,0 +1,92 @@
+name: PROD Increment Version on PR Merged to Main
+
+on:
+  pull_request:
+    types: [closed]
+  workflow_run:
+    workflows: ["Flutter Unit Tests"]
+    types:
+      - completed
+
+jobs:
+  increment-version:
+    if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 
+
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: 'Set default tag if none found'
+        if: ${{ steps.previoustag.outputs.tag == '' }}
+        run: echo "::set-output name=tag::0.0.0"
+
+      - name: 'Print Github Ref'
+        run: | 
+          echo "Github Ref"
+          echo "${{ github.ref }}"
+          echo "${{ github.event.pull_request.head.ref }}"
+  
+      - name: 'Get next version'
+        id: semvers
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.previoustag.outputs.tag || '1.0.0' }}   
+
+      - name: Create tag for minor version
+        if: contains(github.event.pull_request.head.ref, 'minor')
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: "${{ steps.semvers.outputs.minor }}"
+  
+      - name: Create tag for major version
+        if: contains(github.event.pull_request.head.ref, 'major')
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: "${{ steps.semvers.outputs.major }}"
+  
+      - name: Create tag for patch version
+        if: contains(github.event.pull_request.head.ref, 'patch')
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: "${{ steps.semvers.outputs.patch }}"
+
+      - name: 'Get Current tag'
+        id: currenttag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: 'Print Current tag'
+        run: | 
+          echo "TAG OUTPUT"
+          echo "${{ steps.currenttag.outputs.tag }}"
+          
+      - name: Write version to VERSION.txt
+        run: |
+          echo "TAG OUTPUT"
+          echo "${{ steps.currenttag.outputs.tag }}"
+          echo "${{ steps.currenttag.outputs.tag }}" > VERSION.txt
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11.5'
+
+      - name: Increment version
+        run: python scripts/version_update.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m 'ci: version upgrade'
+          git push
