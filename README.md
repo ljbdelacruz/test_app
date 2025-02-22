@@ -1,16 +1,12 @@
 # test_app
 
-A new Flutter project.
+> this app is a test app used for implementing best practices like CI/CD, Bloc, Unit testing, Widget test and End to end Testing
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Run the app
 
-A few resources to get you started if this is your first Flutter project:
+> flutter run 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Test App
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+> flutter test
