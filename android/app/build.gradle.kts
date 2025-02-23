@@ -20,8 +20,8 @@ android {
     }
 
     defaultConfig {
-        versionCode = 4
-        versionName = "1.0.4"
+        versionCode = 5
+        versionName = "1.0.5"
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.test_app"
         // You can update the following values to match your application needs.
