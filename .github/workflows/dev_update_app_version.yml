@@ -1,4 +1,4 @@
-name: DEV Increment Version on PR Merged to Main
+name: DEV Increment Version on PR Merged to Develop
 
 on:
   pull_request:
@@ -19,10 +19,10 @@ jobs:
           fetch-depth: 0 
 
       - name: 'Get Previous tag'
-          id: previoustag
-          uses: "WyriHaximus/github-action-get-previous-tag@v1"
-          env:
-            GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
   
       - name: 'Set default tag if none found'
         if: ${{ steps.previoustag.outputs.tag == '' }}
@@ -38,7 +38,7 @@ jobs:
         id: semvers
         uses: "WyriHaximus/github-action-next-semvers@v1"
         with:
-          version: ${{ steps.previoustag.outputs.tag || '1.0.0' }}   
+          version: ${{ steps.previoustag.outputs.tag || '0.0.0' }}   
 
       - name: Create tag for minor version
         if: contains(github.event.pull_request.head.ref, 'minor')
