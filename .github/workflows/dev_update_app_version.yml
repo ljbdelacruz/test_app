@@ -26,7 +26,7 @@ jobs:
   
       - name: 'Set default tag if none found'
         if: ${{ steps.previoustag.outputs.tag == '' }}
-        run: echo "::set-output name=tag::0.0.0"
+        run: echo "::set-output name=tag::1.0.0"
 
       - name: 'Print Github Ref'
         run: | 
@@ -38,7 +38,7 @@ jobs:
         id: semvers
         uses: "WyriHaximus/github-action-next-semvers@v1"
         with:
-          version: ${{ steps.previoustag.outputs.tag || '0.0.0' }}   
+          version: ${{ steps.previoustag.outputs.tag || '1.0.0' }}   
 
       - name: Create tag for minor version
         if: contains(github.event.pull_request.head.ref, 'minor')
