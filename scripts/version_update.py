@@ -48,17 +48,17 @@ def increment_android_version():
         with open(version_txt_path, 'r') as file:
             current_version = file.read().strip()
 
-        version_code_match = re.search(r'versionCode (\d+)', content)
+        version_code_match = re.search(r'versionCode = (\d+)', content)
         if version_code_match:
             current_version_code = int(version_code_match.group(1))
             new_version_code = current_version_code + 1
         else:
             raise ValueError("versionCode not found in build.gradle")
 
-        content = re.sub(r'versionCode \d+', f'versionCode {new_version_code}', content)
+        content = re.sub(r'versionCode = \d+', f'versionCode = {new_version_code}', content)
 
         # Replace the versionName value
-        content = re.sub(r'versionName "[^"]+"', f'versionName "{current_version}"', content)
+        content = re.sub(r'versionName = "[^"]+"', f'versionName = "{current_version}"', content)
 
         with open(build_gradle_path, 'w') as file:
             file.write(content)
