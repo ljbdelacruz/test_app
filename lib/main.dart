@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:test_app/repository/counter_repository.dart';
-import 'blocs/counter_bloc.dart';
+import 'package:test_app/app_di.dart';
+import 'package:test_app/feature/counter/counter_di.dart';
+import 'package:test_app/feature/counter/data/counter_local_datasource.dart';
+import 'package:test_app/feature/counter/repository/counter_repository.dart';
+import 'feature/counter/blocs/counter_bloc.dart';
 
 void main() async {
   await Hive.initFlutter();
   await Hive.openBox<int>('counterBox');
-  runApp(const MyApp());
+  setupServiceLocator();
+  setupCounterDependencies();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -15,13 +20,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    ICounterLocalDatasource? counterLocalDSResult = getCounterLocalDS().fold((l) => null, (r) => r);
+    if(counterLocalDSResult == null) {
+      // show error here
+    }
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: BlocProvider(
-        create: (_) => CounterBloc(CounterRepository(Hive.box<int>('counterBox'))),
+        create: (_) => CounterBloc(CounterRepository(counterLocalDSResult!)),
         child: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
     );
