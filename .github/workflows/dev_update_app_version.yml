@@ -6,9 +6,9 @@ on:
       - patch/workflow_configuration
   pull_request:
     branches:
-      - develop
+      # - develop
       - patch/workflow_configuration
-    types: [closed]
+    types: [opened]
   workflow_run:
     workflows: ["Flutter Unit Tests"]
     types:
