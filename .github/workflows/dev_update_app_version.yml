@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - develop
+      - patch/workflow_configuration
     types: [closed]
   workflow_run:
     workflows: ["Flutter Unit Tests"]
@@ -45,46 +46,21 @@ jobs:
         with:
           version: ${{ steps.previoustag.outputs.tag || '1.0.0' }}   
 
-      - name: Create tag for minor version
-        if: contains(github.event.pull_request.head.ref, 'minor')
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: "${{ steps.semvers.outputs.minor }}"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-  
-      - name: Create tag for major version
-        if: contains(github.event.pull_request.head.ref, 'major')
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: "${{ steps.semvers.outputs.major }}"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-  
-      - name: Create tag for patch version
-        if: contains(github.event.pull_request.head.ref, 'patch')
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: "${{ steps.semvers.outputs.patch }}"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: 'Get Current tag'
-        id: currenttag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: 'Print Current tag'
-        run: | 
-          echo "TAG OUTPUT"
-          echo "${{ steps.currenttag.outputs.tag }}"
-          
-      - name: Write version to VERSION.txt
+      - name: Determine next version
+        id: nextversion
         run: |
-          echo "TAG OUTPUT"
-          echo "${{ steps.currenttag.outputs.tag }}"
-          echo "${{ steps.currenttag.outputs.tag }}" > VERSION.txt
+          if [[ "${{ github.event.pull_request.head.ref }}" == *"major"* ]]; then
+            echo "next_version=${{ steps.semvers.outputs.major }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event.pull_request.head.ref }}" == *"minor"* ]]; then
+            echo "next_version=${{ steps.semvers.outputs.minor }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event.pull_request.head.ref }}" == *"patch"* ]]; then
+            echo "next_version=${{ steps.semvers.outputs.patch }}" >> $GITHUB_ENV
+          else
+            echo "next_version=${{ steps.semvers.outputs.patch }}" >> $GITHUB_ENV
+          fi
+
+      - name: Write next version to VERSION.txt
+        run: echo "${{ env.next_version }}" > VERSION.txt
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -103,3 +79,10 @@ jobs:
           git add .
           git commit -m 'ci: version upgrade'
           git push origin develop
+
+      - name: Create tag
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: "${{ env.next_version }}"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
