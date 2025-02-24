@@ -10,7 +10,6 @@ on:
       - develop
     types: [closed]
   workflow_dispatch:
-
 permissions:
   contents: write
 
