@@ -20,8 +20,6 @@ class CounterRepository {
       localDS.incrementCounter();
       return Right(RepositorySuccess());
     }catch(e){
-      print("ERROR");
-      print(e);
       return Left(RepositoryFailure());
     }
   }
@@ -32,8 +30,6 @@ class CounterRepository {
       localDS.decrementCounter();
       return Right(RepositorySuccess());
     }catch(e){
-      print("ERROR");
-      print(e);
       return Left(RepositoryFailure());
     }
   }
