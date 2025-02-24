@@ -10,10 +10,6 @@ on:
       - '**/patch/**'
       - '**/major/**'
       - '**/bugfix/**'
-  pull_request:
-    branches:
-      - main
-      - develop
 
 jobs:
   test:
