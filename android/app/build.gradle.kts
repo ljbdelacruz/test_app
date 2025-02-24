@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.test_app"
+    namespace = "com.test.ljtestapp"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -23,7 +23,7 @@ android {
         versionCode = 10
         versionName = "1.1.5"
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.test_app"
+        applicationId = "com.test.ljtestapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
