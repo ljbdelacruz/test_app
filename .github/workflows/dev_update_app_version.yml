@@ -1,6 +1,10 @@
 name: DEV Increment Version on PR Merged to Develop
 
 on:
+  workflow_run:
+    workflows: ["Flutter Unit Tests"]
+    types:
+      - completed
   push:
     branches:
       - patch/workflow_configuration
@@ -8,11 +12,7 @@ on:
     branches:
       # - develop
       - patch/workflow_configuration
-    types: [opened]
-  workflow_run:
-    workflows: ["Flutter Unit Tests"]
-    types:
-      - completed
+    types: [opened, reopened, closed]
 
 permissions:
   contents: write
