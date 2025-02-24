@@ -1,9 +1,6 @@
 name: DEV Increment Version on PR Merged to Develop
 
 on:
-  push:
-    branches:
-      - patch/workflow_configuration
   workflow_run:
     workflows: ["Flutter Unit Tests"]
     types:
@@ -19,7 +16,7 @@ permissions:
 
 jobs:
   increment-version:
-    # if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop') }}
+    if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
