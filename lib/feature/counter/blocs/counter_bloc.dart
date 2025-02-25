@@ -2,7 +2,7 @@
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:test_app/repository/counter_repository.dart';
+import 'package:test_app/feature/counter/repository/counter_repository.dart';
 
 // Events
 abstract class CounterEvent extends Equatable {

@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:test_app/app_di.dart';
+import 'package:test_app/feature/counter/counter_di.dart';
 import 'dart:io';
 import 'package:test_app/main.dart';
 
 void main() {
-  setUpAll(() async {
+  setUp(() async {
     final tempDir = await Directory.systemTemp.createTemp();
     Hive.init(tempDir.path);
     await Hive.openBox<int>('counterBox');
+    setupServiceLocator();
+    setupCounterDependencies();
   });
 
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

@@ -28,52 +28,17 @@ jobs:
         if: ${{ steps.previoustag.outputs.tag == '' }}
         run: echo "::set-output name=tag::0.0.0"
 
-      - name: 'Print Github Ref'
-        run: | 
-          echo "Github Ref"
-          echo "${{ github.ref }}"
-          echo "${{ github.event.pull_request.head.ref }}"
-  
-      - name: 'Get next version'
-        id: semvers
-        uses: "WyriHaximus/github-action-next-semvers@v1"
-        with:
-          version: ${{ steps.previoustag.outputs.tag || '1.0.0' }}   
-
-      - name: Create tag for minor version
-        if: contains(github.event.pull_request.head.ref, 'minor')
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: "${{ steps.semvers.outputs.minor }}"
-  
-      - name: Create tag for major version
-        if: contains(github.event.pull_request.head.ref, 'major')
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: "${{ steps.semvers.outputs.major }}"
-  
-      - name: Create tag for patch version
-        if: contains(github.event.pull_request.head.ref, 'patch')
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: "${{ steps.semvers.outputs.patch }}"
-
-      - name: 'Get Current tag'
-        id: currenttag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: 'Print Current tag'
-        run: | 
-          echo "TAG OUTPUT"
-          echo "${{ steps.currenttag.outputs.tag }}"
-          
-      - name: Write version to VERSION.txt
+      - name: Increment version
+        id: incrementversion
         run: |
-          echo "TAG OUTPUT"
-          echo "${{ steps.currenttag.outputs.tag }}"
-          echo "${{ steps.currenttag.outputs.tag }}" > VERSION.txt
+          previous_tag=${{ steps.previoustag.outputs.tag }}
+          IFS='.' read -r -a version_parts <<< "$previous_tag"
+          patch_version=$((version_parts[2] + 1))
+          new_version="${version_parts[0]}.${version_parts[1]}.$patch_version"
+          echo "new_version=$new_version" >> $GITHUB_ENV
+
+      - name: Write new version to VERSION.txt
+        run: echo "${{ env.new_version }}" > VERSION.txt
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -84,9 +49,19 @@ jobs:
         run: python scripts/version_update.py
 
       - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
-          git commit -m 'ci: version upgrade'
-          git push main
+          git commit -m 'ci: version release update'
+          git push
+
+      - name: Create tag for release
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: "${{  env.new_version }} --release"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+

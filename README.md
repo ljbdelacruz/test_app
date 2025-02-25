@@ -13,7 +13,7 @@
 
 ```
 Invite to test app
-https://appdistribution.firebase.dev/i/cb721a88caecc5fe
+https://appdistribution.firebase.dev/i/198f5bc0fc20beee
 ```
 
 
