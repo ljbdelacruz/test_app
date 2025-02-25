@@ -20,8 +20,8 @@ android {
     }
 
     defaultConfig {
-        versionCode = 12
-        versionName = "1.1.8"
+        versionCode = 13
+        versionName = "1.1.7"
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.test.ljtestapp"
         // You can update the following values to match your application needs.
