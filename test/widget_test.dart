@@ -38,7 +38,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('1'), findsNothing);
-    expect(find.text('0'), findsOneWidget);
+    expect(find.text('0'), findsOneWidget)
 
   });
 }
